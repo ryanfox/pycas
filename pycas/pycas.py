@@ -182,12 +182,12 @@ def do_redirect(cas_host, service_url, opt, secure):
         cas_url += "&{}=true".format(opt)
 
     #  Print redirect page to browser
-    print "Refresh: 0; url={}".format(cas_url)
-    print "Content-type: text/html"
+    print("Refresh: 0; url={}".format(cas_url))
+    print("Content-type: text/html")
     if opt == "gateway":
         domain, path = urlparse.urlparse(service_url)[1:3]
-        print make_pycas_cookie("gateway", domain, path, secure)
-    print "\nIf your browser does not redirect you, then please follow <a href=\"{}\">this link</a>.\n".format(cas_url)
+        print(make_pycas_cookie("gateway", domain, path, secure))
+    print("\nIf your browser does not redirect you, then please follow <a href=\"{}\">this link</a>.\n".format(cas_url))
     raise SystemExit
 
 
@@ -393,10 +393,10 @@ if __name__ == "__main__":
 
     status, userid, cookie = login(CAS_SERVER, SERVICE_URL, secure=0, opt="gateway")
 
-    print "Content-type: text/html"
-    print cookie
-    print
-    print """
+    print("Content-type: text/html")
+    print(cookie)
+    print()
+    print("""
 <html>
 <head>
 <title>
@@ -409,7 +409,7 @@ td {background-color: #dddddd; padding: 4px}
 <body>
 <h2>pycas.py</h2>
 <hr>
-"""
+""")
     #  Print browser parameters from pycas.login
     if "ticket" in cgi.FieldStorage():
         ticket = cgi.FieldStorage()["ticket"].value
@@ -418,17 +418,17 @@ td {background-color: #dddddd; padding: 4px}
 
     in_cookie = os.getenv("HTTP_COOKIE")
 
-    print """
+    print("""
 <p>
 <b>Parameters sent from browser</b>
 <table>
 <tr> <td>Ticket</td> <td>{}</td> </tr>
 <tr> <td>Cookie</td> <td>{}</td> </tr>
 </table>
-</p>""".format(ticket, in_cookie)
+</p>""".format(ticket, in_cookie))
 
     #  Print output from pycas.login
-    print """
+    print("""
 <p>
 <b>Parameters returned from pycas.login()</b>
 <table>
@@ -437,4 +437,4 @@ td {background-color: #dddddd; padding: 4px}
 <tr><td>cookie</td><td> <b>{}</b></td></tr>
 </table>
 </p>
-</body></html>""".format(status, CAS_MSG[status], userid, cookie)
+</body></html>""".format(status, CAS_MSG[status], userid, cookie))
