@@ -1,10 +1,14 @@
 #!/usr/bin/python
 
-#  Debug
-## import os
-## print "Content-type: text/html\n"
-## import sys
-## sys.stderr = sys.stdout
+import cgi
+import hashlib
+import logging
+import os
+import sys
+import time
+import urllib
+import urlparse
+import bs4
 
 """
 Copyright 2011 Jon Rifkin
@@ -60,24 +64,10 @@ limitations under the License.
             status, userid, cookie = pycas.login(CAS_SERVER,THIS_SCRIPT,path="/cgi-bin/accts")
 
     Status Codes are listed below.
-
-
------------------------------------------------------------------------
-  Constants
------------------------------------------------------------------------
-
-    Secret used to produce hash.   This can be any string.  Hackers who know this string can forge
-    this script's authentication cookie.
 """
-import cgi
-import hashlib
-import os
-import sys
-import time
-import urllib
-import urlparse
-import bs4
 
+# Secret used to produce hash.   This can be any string.  Hackers who know this string can forge
+# this script's authentication cookie.
 SECRET = "7e16162998eb7efafb1498f75190a937"
 
 #  Name field for pycas cookie
@@ -110,16 +100,9 @@ CAS_MSG = (
     "CAS server returned without ticket while in gateway mode.",
 )
 
-###Optional log file for debugging
-###LOG_FILE="/tmp/cas.log"
-
-
-def _writelog(msg):
-    """For debugging."""
-    f = open(LOG_FILE, "a")
-    timestr = time.strftime("%Y-%m-%d %H:%M:%S ")
-    f.write(timestr + msg + "\n")
-    f.close()
+# Log file for debugging
+LOG_FILE = "/tmp/cas.log"
+logging.basicConfig(filename=LOG_FILE, level=logging.WARNING, format='%(asctime)s %(message)s')
 
 
 def _parse_tag(string, tag):
@@ -206,7 +189,7 @@ def _decode_cookie(cookie_vals, lifetime=None):
                         cookie_attrs.append(COOKIE_AUTH)
                     else:
                         # ERROR:  Cookie exceeded lifetime
-                        cookie_attrs.append(COOKIE_EXPIRED)
+                        cookie_attrs.append(CAS_COOKIE_EXPIRED)
                 else:
                     #  OK:  Cookie valid (it has no lifetime)
                     cookie_attrs.append(COOKIE_AUTH)
