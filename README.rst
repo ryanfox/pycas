@@ -31,7 +31,7 @@ STEPS TO ADD CAS AUTHENTICATION
 
 1) Add four lines to your Python Web app like this: ::
 
-    from pycas import pycas
+    import pycas
     CAS_SERVER  = "https://casserver.mydomain"
     SERVICE_URL = "http://webserver.mydomain/cgi-bin/webapp.py"
     status, userid, cookie = pycas.login(CAS_SERVER, SERVICE_URL)
