@@ -36,7 +36,7 @@ limitations under the License.
     Using in your script
 
         import pycas
-        status, userid, cookie = pycas.login(CAS_SERVER,THIS_SCRIPT)
+        status, userid, cookie = pycas.login(CAS_SERVER, THIS_SCRIPT)
 
     Required Parameters
 
@@ -51,17 +51,15 @@ limitations under the License.
                    the rest of the session.
 
     Optional Parmaters:
-        - lifetime:  lifetime of the cookie in seconds, enforced by pycas.
-                     Default is 0, meaning unlimited lifetime. # TODO this is not actually enforced
-        - path:      Authentication cookie applies for all urls under 'path'.
-                     Defaults to "/" (all urls).
+        - lifetime:  lifetime of the cookie in seconds, enforced by pycas. Default is 0, meaning unlimited lifetime.
+        - path:      Authentication cookie applies for all urls under 'path'. Defaults to "/" (all urls).
         - protocol:  CAS protocol version.  Default is 2.  Can be set to 1.
-        - secure:    Default is 1, which authenticates for https connections only.
+        - secure:    Default is True, which authenticates for https connections only.
         - opt:       set to 'renew' or 'gateway' for these CAS options.
 
         Examples:
-            status, userid, cookie = pycas.login(CAS_SERVER,THIS_SCRIPT,protocol=1,secure=0)
-            status, userid, cookie = pycas.login(CAS_SERVER,THIS_SCRIPT,path="/cgi-bin/accts")
+            status, userid, cookie = pycas.login(CAS_SERVER, THIS_SCRIPT, protocol=1, secure=True)
+            status, userid, cookie = pycas.login(CAS_SERVER, THIS_SCRIPT, path="/cgi-bin/accts")
 
     Status Codes are listed below.
 """
@@ -102,7 +100,7 @@ CAS_MSG = (
 
 # Log file for debugging
 LOG_FILE = "/tmp/cas.log"
-logging.basicConfig(filename=LOG_FILE, level=logging.WARNING, format='%(asctime)s %(message)s')
+logging.basicConfig(filename=LOG_FILE, level=logging.DEBUG, format='%(asctime)s %(message)s')
 
 
 def _parse_tag(string, tag):
@@ -291,15 +289,11 @@ def _get_ticket_status(cas_host, service_url, protocol, opt):
         return TICKET_NONE, ""
 
 
-#-----------------------------------------------------------------------
-#  Exported functions
-#-----------------------------------------------------------------------
-
-#  Login to cas and return user id.
-#
-#   Returns status, id, pycas_cookie.
-#
-def login(cas_host, service_url, lifetime=None, secure=1, protocol=2, path="/", opt=""):
+def login(cas_host, service_url, lifetime=None, secure=True, protocol=2, path="/", opt=""):
+    """
+    Login to CAS and return user id.  Return status, userid, pycas_cookie.
+    """
+    # TODO lifetime isn't enforced
 
     #  Check cookie for previous pycas state, with is either
     #     COOKIE_AUTH    - client already authenticated by pycas.
@@ -310,6 +304,7 @@ def login(cas_host, service_url, lifetime=None, secure=1, protocol=2, path="/", 
     cookie_status, cookieid = _get_cookie_status()
 
     if cookie_status == COOKIE_AUTH:
+        logging.info('login valid for {}'.format(cookieid))
         return CAS_OK, cookieid, ""
 
     if cookie_status == COOKIE_INVALID:
@@ -324,6 +319,7 @@ def login(cas_host, service_url, lifetime=None, secure=1, protocol=2, path="/", 
     ticket_status, ticketid = _get_ticket_status(cas_host, service_url, protocol, opt)
 
     if ticket_status == TICKET_OK:
+        logging.info('ticket valid for {}'.format(ticketid))
         timestr = str(int(time.time()))
         hashvalue = _makehash(timestr + ":" + ticketid)
         cookie_val = hashvalue + timestr + ":" + ticketid
@@ -356,7 +352,7 @@ if __name__ == "__main__":
     CAS_SERVER = "https://login.uconn.edu"
     SERVICE_URL = "http://bluet.ucc.uconn.edu/~jon/cgi-bin/pycas.py"
 
-    status, userid, cookie = login(CAS_SERVER, SERVICE_URL, secure=0, opt="gateway")
+    status, userid, cookie = login(CAS_SERVER, SERVICE_URL, secure=True, opt="gateway")
 
     print("Content-type: text/html")
     print(cookie)
