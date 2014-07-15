@@ -1,5 +1,5 @@
 ===============
-pycas v0.0.2
+pycas v0.0.3
 ===============
 
 What?
@@ -12,7 +12,10 @@ that situation.
 
 Potential things to be added:
     - Unit tests
-    - Better security
+    - Better security:
+        * Remove default secret key
+        * Better yet, ditch md5 entirely
+        * Add signed cookies (e.g. itsdangerous)
     - Enforce the timeout
 
 Installation

@@ -7,7 +7,7 @@ def read(filename):
 
 
 setup(name='pycas',
-      version='0.0.2',
+      version='0.0.3',
       author='Ryan Fox',
       author_email='ryan@foxrow.com',
       url='https://github.com/ryanfox/pycas',

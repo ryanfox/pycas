@@ -133,7 +133,7 @@ def _make_pycas_cookie(val, domain, path, secure, expires=None):
     pycascookie = "Set-Cookie: {}={};domain={};path={}".format(PYCAS_NAME, val, domain, path)
     if secure:
         pycascookie += ";secure"
-    if expires:
+    if expires is not None:
         pycascookie += ";expires=" + expires
     return pycascookie
 
