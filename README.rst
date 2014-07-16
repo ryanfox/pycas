@@ -2,6 +2,10 @@
 pycas v0.0.3
 ===============
 
+Notice: this seems to not quite fit the needs of the project it was intended for.  It will remain in its current form,
+but consider the package no longer maintained.  Feel free to improve it further if you choose, and submit pull
+requests on github.
+
 What?
 ===============
 This is a copy of Jon Rifkin's Python CAS client.  The original can be found at

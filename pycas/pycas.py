@@ -1,7 +1,6 @@
 #!/usr/bin/python
 
 import cgi
-import hashlib
 import logging
 import os
 import sys
@@ -9,6 +8,7 @@ import time
 import urllib
 import urlparse
 import bs4
+from itsdangerous import Signer
 
 """
 Copyright 2011 Jon Rifkin
@@ -102,6 +102,8 @@ CAS_MSG = (
 LOG_FILE = "/tmp/cas.log"
 logging.basicConfig(filename=LOG_FILE, level=logging.DEBUG, format='%(asctime)s %(message)s')
 
+SIGNER = Signer(SECRET)
+
 
 def _parse_tag(string, tag):
     """
@@ -118,14 +120,6 @@ def _split2(string, sep):
     """Split string in exactly two pieces, return '' for missing pieces."""
     parts = string.split(sep, 1) + ["", ""]
     return parts[0], parts[1]
-
-
-def _makehash(string, secret=SECRET):
-    """Use hash and secret to encrypt string."""
-    m = hashlib.md5()
-    m.update(string)
-    m.update(secret)
-    return m.hexdigest()[0:8]
 
 
 def _make_pycas_cookie(val, domain, path, secure, expires=None):
@@ -176,10 +170,9 @@ def _decode_cookie(cookie_vals, lifetime=None):
             cookie_attrs.append(COOKIE_GATEWAY)
         else:  # Test for valid pycas authentication cookie.
             # Separate cookie parts
-            oldhash = cookie_val[0:8]
             timestr, cookieid = _split2(cookie_val[8:], ":")
             #  Verify hash
-            if oldhash == _makehash(timestr + ":" + cookieid):
+            if SIGNER.unsign(cookie_val):
                 #  Check lifetime
                 if lifetime:
                     if str(int(time.time()+int(lifetime))) < timestr:
@@ -320,9 +313,7 @@ def login(cas_host, service_url, lifetime=None, secure=True, protocol=2, path="/
 
     if ticket_status == TICKET_OK:
         logging.info('ticket valid for {}'.format(ticketid))
-        timestr = str(int(time.time()))
-        hashvalue = _makehash(timestr + ":" + ticketid)
-        cookie_val = hashvalue + timestr + ":" + ticketid
+        cookie_val = SIGNER.sign(ticketid)
         domain = urlparse.urlparse(service_url)[1]
         return CAS_OK, ticketid, _make_pycas_cookie(cookie_val, domain, path, secure)
 

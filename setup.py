@@ -19,4 +19,4 @@ setup(name='pycas',
       classifiers=['Topic :: System :: Systems Administration :: Authentication/Directory',
                    'Topic :: Utilities',
                    'License :: OSI Approved :: Apache Software License'],
-      install_requires=['beautifulsoup4', 'lxml'])
+      install_requires=['beautifulsoup4', 'lxml', 'itsdangerous'])
